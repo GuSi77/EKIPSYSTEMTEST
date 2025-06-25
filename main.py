@@ -121,7 +121,7 @@ async def on_member_join(member):
             # Haupttext mit Benutzername und ID
             log_embed.add_field(
                 name="",
-                value=f"**{member.name}** `{member.id}`\n@{member.mention} trat dem Server bei.",
+                value=f"**{member.name}** `{member.id}`\n{member.mention} trat dem Server bei.",
                 inline=False
             )
 
@@ -265,7 +265,7 @@ async def test_join(ctx):
 
             log_embed.add_field(
                 name="",
-                value=f"**{ctx.author.name}** `{ctx.author.id}`\n@{ctx.author.mention} trat dem Server bei.",
+                value=f"**{ctx.author.name}** `{ctx.author.id}`\n{ctx.author.mention} trat dem Server bei.",
                 inline=False
             )
 
@@ -345,4 +345,3 @@ if TOKEN:
 else:
     print(
         "Fehler: Bot-Token nicht gefunden. Bitte setze die Umgebungsvariable 'DISCORD_BOT_TOKEN' oder füge das Token direkt in den Code ein.")
-
