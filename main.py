@@ -227,7 +227,7 @@ async def on_voice_state_update(member, before, after):
             # Haupttext für Beitritt
             log_embed.add_field(
                 name="",
-                value=f"{member.mention} ist dem Sprachkanal **{after.channel.name}** beigetreten.",
+                value=f"{member.mention} ist dem Sprachkanal `{after.channel.name}` beigetreten.",
                 inline=False
             )
 
@@ -260,7 +260,7 @@ async def on_voice_state_update(member, before, after):
             # Haupttext für Verlassen
             log_embed.add_field(
                 name="",
-                value=f"{member.mention} hat den Sprachkanal **{before.channel.name}** verlassen.",
+                value=f"{member.mention} hat den Sprachkanal `{before.channel.name}` verlassen.",
                 inline=False
             )
 
@@ -293,7 +293,7 @@ async def on_voice_state_update(member, before, after):
             # Haupttext für Wechsel
             log_embed.add_field(
                 name="",
-                value=f"{member.mention} ist von **{before.channel.name}** zu **{after.channel.name}** gewechselt.",
+                value=f"{member.mention} ist von `{before.channel.name}` zu `{after.channel.name}` gewechselt.",
                 inline=False
             )
 
@@ -452,3 +452,4 @@ if TOKEN:
 else:
     print(
         "Fehler: Bot-Token nicht gefunden. Bitte setze die Umgebungsvariable 'DISCORD_BOT_TOKEN' oder füge das Token direkt in den Code ein.")
+
