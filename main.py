@@ -35,7 +35,7 @@ async def on_member_join(member):
     print(f"🎉 DEBUG: {member.name} ({member.id}) ist dem Server {member.guild.name} beigetreten!")
 
     # Konfiguration
-    welcome_channel_id = 1250809478232932402  # Willkommenskanal
+    welcome_channel_id = 1387484818052481164  # Neuer Willkommenskanal
     join_log_channel_id = 1387484930438598859  # Join-Log-Kanal
     role_name = "Mitglied"  # Rolle für neue Mitglieder
 
@@ -46,13 +46,17 @@ async def on_member_join(member):
             embed = discord.Embed(
                 title=f"Willkommen auf dem Server, {member.name}!",
                 description=f"Schön, dass du da bist, {member.mention}!\n\nWir hoffen, du hast eine tolle Zeit hier.",
-                color=discord.Color.red()
+                color=discord.Color.dark_red()
             )
 
-            if member.avatar:
-                embed.set_thumbnail(url=member.avatar.url)
+            # Setze das Server-Icon als Autor-Bild und Thumbnail
+            if member.guild.icon:
+                embed.set_author(name=member.name, icon_url=member.guild.icon.url)
+                embed.set_thumbnail(url=member.guild.icon.url)
+                embed.set_footer(text=f"Willkommen auf {member.guild.name}", icon_url=member.guild.icon.url)
             else:
-                embed.set_thumbnail(url=member.default_avatar.url)
+                embed.set_author(name=member.name)
+                embed.set_footer(text=f"Willkommen auf {member.guild.name}")
 
             embed.add_field(
                 name="Server-Info",
