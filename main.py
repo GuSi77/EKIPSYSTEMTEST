@@ -53,10 +53,14 @@ async def on_member_join(member):
             if member.guild.icon:
                 embed.set_author(name=member.name, icon_url=member.guild.icon.url)
                 embed.set_thumbnail(url=member.guild.icon.url)
-                embed.set_footer(text=f"Willkommen auf {member.guild.name}", icon_url=member.guild.icon.url)
             else:
                 embed.set_author(name=member.name)
-                embed.set_footer(text=f"Willkommen auf {member.guild.name}")
+
+            embed.add_field(
+                name="Server-Info",
+                value=f"Du bist das {len(member.guild.members)}. Mitglied!",
+                inline=False
+            )
 
             await welcome_channel.send(embed=embed)
             print(f"✅ Willkommensnachricht für {member.name} gesendet!")
@@ -307,10 +311,14 @@ async def test_welcome(ctx):
             if ctx.guild.icon:
                 embed.set_author(name=ctx.author.name, icon_url=ctx.guild.icon.url)
                 embed.set_thumbnail(url=ctx.guild.icon.url)
-                embed.set_footer(text=f"Willkommen auf {ctx.guild.name}", icon_url=ctx.guild.icon.url)
             else:
                 embed.set_author(name=ctx.author.name)
-                embed.set_footer(text=f"Willkommen auf {ctx.guild.name}")
+
+            embed.add_field(
+                name="Server-Info",
+                value=f"Du bist das {len(ctx.guild.members)}. Mitglied!",
+                inline=False
+            )
 
             await welcome_channel.send(embed=embed)
             await ctx.send("Test-Willkommensnachricht wurde ausgelöst! Überprüfe den Willkommenskanal.")
@@ -337,3 +345,4 @@ if TOKEN:
 else:
     print(
         "Fehler: Bot-Token nicht gefunden. Bitte setze die Umgebungsvariable 'DISCORD_BOT_TOKEN' oder füge das Token direkt in den Code ein.")
+
