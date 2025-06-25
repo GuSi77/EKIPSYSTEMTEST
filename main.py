@@ -85,7 +85,7 @@ async def on_member_join(member):
     try:
         embed = discord.Embed(
             title=f"Willkommen auf dem Server, {member.name}!",
-            description=f"Schön, dass du da bist, {member.mention}! Wir hoffen, du hast eine tolle Zeit hier.",
+            description=f"Schön, dass du da bist, {member.mention}!/n/n Wir hoffen, du hast eine tolle Zeit hier.",
             color=discord.Color.red()
         )
 
