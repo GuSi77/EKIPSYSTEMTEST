@@ -205,10 +205,120 @@ async def ping(ctx):
 
 @bot.command()
 async def test_join(ctx):
-    """Test-Befehl um die Willkommensfunktion manuell zu testen"""
-    print(f"Test-Join angefordert von {ctx.author.name}")
-    await on_member_join(ctx.author)
-    await ctx.send("Test-Willkommensnachricht und Join-Log wurden ausgelöst! Überprüfe die Kanäle.")
+    """Test-Befehl um nur die Join-Log-Funktion manuell zu testen"""
+    print(f"Test-Join-Log angefordert von {ctx.author.name}")
+
+    # Nur Join-Log Teil ausführen
+    join_log_channel_id = 1387484930438598859
+    log_channel = bot.get_channel(join_log_channel_id)
+
+    if log_channel:
+        try:
+            from datetime import datetime
+
+            # Berechne Kontoalter
+            account_created = ctx.author.created_at
+            now = datetime.now(account_created.tzinfo)
+            account_age = now - account_created
+
+            # Formatiere das Kontoalter
+            if account_age.days >= 365:
+                years = account_age.days // 365
+                months = (account_age.days % 365) // 30
+                if years == 1:
+                    age_text = f"{years} year"
+                else:
+                    age_text = f"{years} years"
+                if months > 0:
+                    age_text += f", {months} months"
+            elif account_age.days >= 30:
+                months = account_age.days // 30
+                if months == 1:
+                    age_text = f"{months} month"
+                else:
+                    age_text = f"{months} months"
+            elif account_age.days > 0:
+                if account_age.days == 1:
+                    age_text = f"{account_age.days} day"
+                else:
+                    age_text = f"{account_age.days} days"
+            else:
+                hours = account_age.seconds // 3600
+                if hours == 1:
+                    age_text = f"{hours} hour"
+                else:
+                    age_text = f"{hours} hours"
+
+            # Erstelle Join-Log Embed
+            log_embed = discord.Embed(color=discord.Color.dark_red())
+
+            if ctx.author.avatar:
+                log_embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar.url)
+                log_embed.set_thumbnail(url=ctx.author.avatar.url)
+            else:
+                log_embed.set_author(name=ctx.author.name, icon_url=ctx.author.default_avatar.url)
+                log_embed.set_thumbnail(url=ctx.author.default_avatar.url)
+
+            log_embed.add_field(
+                name="",
+                value=f"**{ctx.author.name}** `{ctx.author.id}`\n@{ctx.author.mention} trat dem Server bei.",
+                inline=False
+            )
+
+            log_embed.add_field(
+                name="⏰ Alter des Kontos:",
+                value=f"{account_created.strftime('%d/%m/%Y %H:%M')}\n**{age_text} ago**",
+                inline=False
+            )
+
+            current_time = datetime.now().strftime('%H:%M')
+            log_embed.add_field(
+                name="",
+                value=f"**{ctx.guild.name}** • heute um {current_time} Uhr",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            await ctx.send("Test-Join-Log wurde ausgelöst! Überprüfe den Join-Log-Kanal.")
+
+        except Exception as e:
+            await ctx.send(f"Fehler beim Test-Join-Log: {e}")
+    else:
+        await ctx.send("Join-Log-Kanal nicht gefunden!")
+
+
+@bot.command()
+async def test_welcome(ctx):
+    """Test-Befehl um nur die Willkommensnachricht manuell zu testen"""
+    print(f"Test-Willkommensnachricht angefordert von {ctx.author.name}")
+
+    # Nur Willkommensnachricht Teil ausführen
+    welcome_channel_id = 1387484818052481164
+    welcome_channel = bot.get_channel(welcome_channel_id)
+
+    if welcome_channel:
+        try:
+            embed = discord.Embed(
+                title=f"Willkommen auf dem Server, {ctx.author.name}!",
+                description=f"Schön, dass du da bist, {ctx.author.mention}!\n\nWir hoffen, du hast eine tolle Zeit hier.",
+                color=discord.Color.dark_red()
+            )
+
+            if ctx.guild.icon:
+                embed.set_author(name=ctx.author.name, icon_url=ctx.guild.icon.url)
+                embed.set_thumbnail(url=ctx.guild.icon.url)
+                embed.set_footer(text=f"Willkommen auf {ctx.guild.name}", icon_url=ctx.guild.icon.url)
+            else:
+                embed.set_author(name=ctx.author.name)
+                embed.set_footer(text=f"Willkommen auf {ctx.guild.name}")
+
+            await welcome_channel.send(embed=embed)
+            await ctx.send("Test-Willkommensnachricht wurde ausgelöst! Überprüfe den Willkommenskanal.")
+
+        except Exception as e:
+            await ctx.send(f"Fehler bei Test-Willkommensnachricht: {e}")
+    else:
+        await ctx.send("Willkommenskanal nicht gefunden!")
 
 
 @bot.command()
