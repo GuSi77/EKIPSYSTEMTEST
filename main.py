@@ -35,7 +35,7 @@ async def on_member_join(member):
     print(f"Member joined event wurde ausgelöst!")
 
     # Konfiguration
-    welcome_channel_id = 1250809478232932402  # Deine Kanal-ID
+    welcome_channel_id = 1387484818052481164  # Deine Kanal-ID
     role_name = "Mitglied"  # Deine Rolle
 
     # Debug: Kanal-Zugriff testen
@@ -86,7 +86,7 @@ async def on_member_join(member):
         embed = discord.Embed(
             title=f"Willkommen auf dem Server, {member.name}!",
             description=f"Schön, dass du da bist, {member.mention}!\n\n Wir hoffen, du hast eine tolle Zeit hier.",
-            color=discord.Color.red()
+            color=discord.Color.dark_red()
         )
 
         # Optional: Füge das Profilbild des neuen Mitglieds hinzu
