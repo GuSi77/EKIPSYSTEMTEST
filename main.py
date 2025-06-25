@@ -12,6 +12,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
+    await bot.change_presence(status=discord.Status.dnd) # <-- Diese Zeile hinzufügen
     print(f'{bot.user} hat sich erfolgreich angemeldet!')
 
 @bot.command()
@@ -23,4 +24,5 @@ if TOKEN:
     bot.run(TOKEN)
 else:
     print("Fehler: Bot-Token nicht gefunden. Bitte setze die Umgebungsvariable 'DISCORD_BOT_TOKEN' oder füge das Token direkt in den Code ein.")
+
 
