@@ -157,7 +157,7 @@ async def on_member_remove(member):
     print(f"👋 DEBUG: {member.name} ({member.id}) hat den Server {member.guild.name} verlassen!")
 
     # Konfiguration
-    join_log_channel_id = 1387484930438598859  # Gleicher Kanal wie Join-Logs
+    join_log_channel_id = 1387484932862906450
 
     # === LEAVE-LOG ===
     log_channel = bot.get_channel(join_log_channel_id)
