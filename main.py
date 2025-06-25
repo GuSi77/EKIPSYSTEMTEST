@@ -108,10 +108,12 @@ async def on_member_join(member):
                 color=discord.Color.dark_red()  # Dunkelrote Farbe statt Discord-Blau
             )
 
-            # Setze das Profilbild des Benutzers als Thumbnail
+            # Setze das Profilbild des Benutzers als Author-Bild
             if member.avatar:
+                log_embed.set_author(name=member.name, icon_url=member.avatar.url)
                 log_embed.set_thumbnail(url=member.avatar.url)
             else:
+                log_embed.set_author(name=member.name, icon_url=member.default_avatar.url)
                 log_embed.set_thumbnail(url=member.default_avatar.url)
 
             # Haupttext mit Benutzername und ID
@@ -168,10 +170,12 @@ async def on_member_remove(member):
                 color=discord.Color.dark_red()
             )
 
-            # Setze das Profilbild des Benutzers als Thumbnail
+            # Setze das Profilbild des Benutzers als Author-Bild
             if member.avatar:
+                log_embed.set_author(name=member.name, icon_url=member.avatar.url)
                 log_embed.set_thumbnail(url=member.avatar.url)
             else:
+                log_embed.set_author(name=member.name, icon_url=member.default_avatar.url)
                 log_embed.set_thumbnail(url=member.default_avatar.url)
 
             # Haupttext mit Benutzername und ID
