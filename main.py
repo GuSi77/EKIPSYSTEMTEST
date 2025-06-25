@@ -35,11 +35,11 @@ async def on_member_join(member):
     print(f"🎉 DEBUG: {member.name} ({member.id}) ist dem Server {member.guild.name} beigetreten!")
 
     # Konfiguration
-    welcome_channel_id = 1387484818052481164  # Neuer Willkommenskanal
+    welcome_channel_id = 1387484818052481164  # Willkommenskanal
     join_log_channel_id = 1387484930438598859  # Join-Log-Kanal
     role_name = "Mitglied"  # Rolle für neue Mitglieder
 
-    # === WILLKOMMENSNACHRICHT (wie bisher) ===
+    # === WILLKOMMENSNACHRICHT ===
     welcome_channel = bot.get_channel(welcome_channel_id)
     if welcome_channel:
         try:
@@ -68,7 +68,7 @@ async def on_member_join(member):
         except Exception as e:
             print(f"❌ Fehler bei Willkommensnachricht: {e}")
 
-    # === JOIN-LOG (mit Benutzer-Profilbild und dunkelroter Farbe) ===
+    # === JOIN-LOG ===
     log_channel = bot.get_channel(join_log_channel_id)
     if log_channel:
         try:
@@ -106,9 +106,7 @@ async def on_member_join(member):
                     age_text = f"{hours} hours"
 
             # Erstelle Join-Log Embed mit dunkelroter Farbe
-            log_embed = discord.Embed(
-                color=discord.Color.dark_red()  # Dunkelrote Farbe statt Discord-Blau
-            )
+            log_embed = discord.Embed(color=discord.Color.dark_red())
 
             # Setze das Profilbild des Benutzers als Author-Bild
             if member.avatar:
@@ -146,7 +144,7 @@ async def on_member_join(member):
         except Exception as e:
             print(f"❌ Fehler bei Join-Log: {e}")
 
-    # === ROLLE ZUWEISEN (wie bisher) ===
+    # === ROLLE ZUWEISEN ===
     role = discord.utils.get(member.guild.roles, name=role_name)
     if role:
         try:
@@ -161,16 +159,14 @@ async def on_member_remove(member):
     print(f"👋 DEBUG: {member.name} ({member.id}) hat den Server {member.guild.name} verlassen!")
 
     # Konfiguration
-    leave_log_channel_id = 1387484932862906450  # Neuer Leave-Log-Kanal
+    leave_log_channel_id = 1387484932862906450  # Leave-Log-Kanal
 
     # === LEAVE-LOG ===
     log_channel = bot.get_channel(leave_log_channel_id)
     if log_channel:
         try:
             # Erstelle Leave-Log Embed mit dunkelroter Farbe
-            log_embed = discord.Embed(
-                color=discord.Color.dark_red()
-            )
+            log_embed = discord.Embed(color=discord.Color.dark_red())
 
             # Setze das Profilbild des Benutzers als Author-Bild
             if member.avatar:
@@ -202,6 +198,119 @@ async def on_member_remove(member):
             print(f"❌ Fehler bei Leave-Log: {e}")
 
 
+@bot.event
+async def on_voice_state_update(member, before, after):
+    """Event für Voice-Channel Beitritt und Verlassen"""
+
+    # Konfiguration
+    voice_log_channel_id = 1387484934423449631  # Voice-Log-Kanal
+
+    log_channel = bot.get_channel(voice_log_channel_id)
+    if not log_channel:
+        return
+
+    current_time = datetime.now().strftime('%H:%M')
+
+    # Voice-Channel beigetreten
+    if before.channel is None and after.channel is not None:
+        print(f"🔊 DEBUG: {member.name} ist dem Voice-Channel {after.channel.name} beigetreten!")
+
+        try:
+            log_embed = discord.Embed(color=discord.Color.dark_red())
+
+            # Setze das Benutzer-Profilbild als Autor-Bild
+            if member.avatar:
+                log_embed.set_author(name=member.name, icon_url=member.avatar.url)
+            else:
+                log_embed.set_author(name=member.name, icon_url=member.default_avatar.url)
+
+            # Haupttext für Beitritt
+            log_embed.add_field(
+                name="",
+                value=f"{member.mention} ist dem Sprachkanal **{after.channel.name}** beigetreten.",
+                inline=False
+            )
+
+            # Server-Name und Zeit
+            log_embed.add_field(
+                name="",
+                value=f"**{member.guild.name}** • heute um {current_time} Uhr",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            print(f"✅ Voice-Join-Log für {member.name} gesendet!")
+
+        except Exception as e:
+            print(f"❌ Fehler bei Voice-Join-Log: {e}")
+
+    # Voice-Channel verlassen
+    elif before.channel is not None and after.channel is None:
+        print(f"🔇 DEBUG: {member.name} hat den Voice-Channel {before.channel.name} verlassen!")
+
+        try:
+            log_embed = discord.Embed(color=discord.Color.dark_red())
+
+            # Setze das Benutzer-Profilbild als Autor-Bild
+            if member.avatar:
+                log_embed.set_author(name=member.name, icon_url=member.avatar.url)
+            else:
+                log_embed.set_author(name=member.name, icon_url=member.default_avatar.url)
+
+            # Haupttext für Verlassen
+            log_embed.add_field(
+                name="",
+                value=f"{member.mention} hat den Sprachkanal **{before.channel.name}** verlassen.",
+                inline=False
+            )
+
+            # Server-Name und Zeit
+            log_embed.add_field(
+                name="",
+                value=f"**{member.guild.name}** • heute um {current_time} Uhr",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            print(f"✅ Voice-Leave-Log für {member.name} gesendet!")
+
+        except Exception as e:
+            print(f"❌ Fehler bei Voice-Leave-Log: {e}")
+
+    # Voice-Channel gewechselt
+    elif before.channel is not None and after.channel is not None and before.channel != after.channel:
+        print(f"🔄 DEBUG: {member.name} ist von {before.channel.name} zu {after.channel.name} gewechselt!")
+
+        try:
+            log_embed = discord.Embed(color=discord.Color.dark_red())
+
+            # Setze das Benutzer-Profilbild als Autor-Bild
+            if member.avatar:
+                log_embed.set_author(name=member.name, icon_url=member.avatar.url)
+            else:
+                log_embed.set_author(name=member.name, icon_url=member.default_avatar.url)
+
+            # Haupttext für Wechsel
+            log_embed.add_field(
+                name="",
+                value=f"{member.mention} ist von **{before.channel.name}** zu **{after.channel.name}** gewechselt.",
+                inline=False
+            )
+
+            # Server-Name und Zeit
+            log_embed.add_field(
+                name="",
+                value=f"**{member.guild.name}** • heute um {current_time} Uhr",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            print(f"✅ Voice-Switch-Log für {member.name} gesendet!")
+
+        except Exception as e:
+            print(f"❌ Fehler bei Voice-Switch-Log: {e}")
+
+
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong!')
@@ -218,8 +327,6 @@ async def test_join(ctx):
 
     if log_channel:
         try:
-            from datetime import datetime
-
             # Berechne Kontoalter
             account_created = ctx.author.created_at
             now = datetime.now(account_created.tzinfo)
