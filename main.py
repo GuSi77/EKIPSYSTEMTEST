@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+from datetime import datetime
 
 # Lade das Bot-Token aus der Umgebungsvariable namens 'DISCORD_BOT_TOKEN'
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
@@ -32,101 +33,167 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     print(f"🎉 DEBUG: {member.name} ({member.id}) ist dem Server {member.guild.name} beigetreten!")
-    print(f"Member joined event wurde ausgelöst!")
 
     # Konfiguration
-    welcome_channel_id = 1387484818052481164  # Deine Kanal-ID
-    role_name = "Mitglied"  # Deine Rolle
+    welcome_channel_id = 1250809478232932402  # Willkommenskanal
+    join_log_channel_id = 1387484930438598859  # Join-Log-Kanal
+    role_name = "Mitglied"  # Rolle für neue Mitglieder
 
-    # Debug: Kanal-Zugriff testen
-    channel = bot.get_channel(welcome_channel_id)
-    if channel:
-        print(f"✅ DEBUG: Willkommenskanal gefunden: {channel.name} (ID: {channel.id})")
+    # === WILLKOMMENSNACHRICHT (wie bisher) ===
+    welcome_channel = bot.get_channel(welcome_channel_id)
+    if welcome_channel:
+        try:
+            embed = discord.Embed(
+                title=f"Willkommen auf dem Server, {member.name}!",
+                description=f"Schön, dass du da bist, {member.mention}!\n\nWir hoffen, du hast eine tolle Zeit hier.",
+                color=discord.Color.red()
+            )
 
-        # Debug: Bot-Berechtigungen im Kanal prüfen
-        bot_member = channel.guild.get_member(bot.user.id)
-        permissions = channel.permissions_for(bot_member)
-        print(f"Bot-Berechtigungen im Kanal:")
-        print(f"  - Nachrichten senden: {permissions.send_messages}")
-        print(f"  - Embeds senden: {permissions.embed_links}")
-        print(f"  - Kanal lesen: {permissions.read_messages}")
+            if member.avatar:
+                embed.set_thumbnail(url=member.avatar.url)
+            else:
+                embed.set_thumbnail(url=member.default_avatar.url)
 
-    else:
-        print(f"❌ FEHLER: Willkommenskanal mit ID {welcome_channel_id} nicht gefunden!")
-        print("Verfügbare Kanäle auf diesem Server:")
-        for ch in member.guild.channels:
-            if isinstance(ch, discord.TextChannel):
-                print(f"  - {ch.name} (ID: {ch.id})")
-        return
+            embed.add_field(
+                name="Server-Info",
+                value=f"Du bist das {len(member.guild.members)}. Mitglied!",
+                inline=False
+            )
 
-    # Debug: Rolle testen
+            await welcome_channel.send(embed=embed)
+            print(f"✅ Willkommensnachricht für {member.name} gesendet!")
+
+        except Exception as e:
+            print(f"❌ Fehler bei Willkommensnachricht: {e}")
+
+    # === JOIN-LOG (mit Benutzer-Profilbild und dunkelroter Farbe) ===
+    log_channel = bot.get_channel(join_log_channel_id)
+    if log_channel:
+        try:
+            # Berechne Kontoalter
+            account_created = member.created_at
+            now = datetime.now(account_created.tzinfo)
+            account_age = now - account_created
+
+            # Formatiere das Kontoalter
+            if account_age.days >= 365:
+                years = account_age.days // 365
+                months = (account_age.days % 365) // 30
+                if years == 1:
+                    age_text = f"{years} year"
+                else:
+                    age_text = f"{years} years"
+                if months > 0:
+                    age_text += f", {months} months"
+            elif account_age.days >= 30:
+                months = account_age.days // 30
+                if months == 1:
+                    age_text = f"{months} month"
+                else:
+                    age_text = f"{months} months"
+            elif account_age.days > 0:
+                if account_age.days == 1:
+                    age_text = f"{account_age.days} day"
+                else:
+                    age_text = f"{account_age.days} days"
+            else:
+                hours = account_age.seconds // 3600
+                if hours == 1:
+                    age_text = f"{hours} hour"
+                else:
+                    age_text = f"{hours} hours"
+
+            # Erstelle Join-Log Embed mit dunkelroter Farbe
+            log_embed = discord.Embed(
+                color=discord.Color.dark_red()  # Dunkelrote Farbe statt Discord-Blau
+            )
+
+            # Setze das Profilbild des Benutzers als Thumbnail
+            if member.avatar:
+                log_embed.set_thumbnail(url=member.avatar.url)
+            else:
+                log_embed.set_thumbnail(url=member.default_avatar.url)
+
+            # Haupttext mit Benutzername und ID
+            log_embed.add_field(
+                name="",
+                value=f"**{member.name}** `{member.id}`\n@{member.mention} trat dem Server bei.",
+                inline=False
+            )
+
+            # Kontoalter
+            log_embed.add_field(
+                name="⏰ Alter des Kontos:",
+                value=f"{account_created.strftime('%d/%m/%Y %H:%M')}\n**{age_text} ago**",
+                inline=False
+            )
+
+            # Server-Name und aktuelle Zeit
+            current_time = datetime.now().strftime('%H:%M')
+            log_embed.add_field(
+                name="",
+                value=f"**{member.guild.name}** • heute um {current_time} Uhr",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            print(f"✅ Join-Log für {member.name} gesendet!")
+
+        except Exception as e:
+            print(f"❌ Fehler bei Join-Log: {e}")
+
+    # === ROLLE ZUWEISEN (wie bisher) ===
     role = discord.utils.get(member.guild.roles, name=role_name)
-    if role:
-        print(f"✅ DEBUG: Rolle gefunden: {role.name} (ID: {role.id})")
-
-        # Debug: Bot-Berechtigungen für Rollenverwaltung prüfen
-        bot_member = member.guild.get_member(bot.user.id)
-        can_manage_roles = bot_member.guild_permissions.manage_roles
-        print(f"Bot kann Rollen verwalten: {can_manage_roles}")
-
-        # Debug: Rollenhierarchie prüfen
-        bot_top_role = bot_member.top_role
-        print(f"Bot's höchste Rolle: {bot_top_role.name} (Position: {bot_top_role.position})")
-        print(f"Zuzuweisende Rolle: {role.name} (Position: {role.position})")
-        print(f"Bot kann diese Rolle zuweisen: {bot_top_role.position > role.position}")
-
-    else:
-        print(f"❌ FEHLER: Rolle '{role_name}' nicht gefunden!")
-        print("Verfügbare Rollen auf diesem Server:")
-        for r in member.guild.roles:
-            print(f"  - {r.name} (ID: {r.id})")
-
-    # Willkommensnachricht senden
-    try:
-        embed = discord.Embed(
-            title=f"Willkommen auf dem Server, {member.name}!",
-            description=f"Schön, dass du da bist, {member.mention}!\n\n Wir hoffen, du hast eine tolle Zeit hier.",
-            color=discord.Color.dark_red()
-        )
-
-        # Optional: Füge das Profilbild des neuen Mitglieds hinzu
-        if member.avatar:
-            embed.set_thumbnail(url=member.avatar.url)
-        else:
-            embed.set_thumbnail(url=member.default_avatar.url)
-
-        # Optional: Füge ein Feld mit Server-Informationen hinzu
-        embed.add_field(
-            name="Server-Info",
-            value=f"Du bist das {len(member.guild.members)}. Mitglied!",
-            inline=False
-        )
-
-        await channel.send(embed=embed)
-        print(f"✅ DEBUG: Willkommensnachricht für {member.name} erfolgreich gesendet!")
-
-    except discord.Forbidden:
-        print(f"❌ FEHLER: Bot hat keine Berechtigung, Nachrichten in {channel.name} zu senden!")
-    except Exception as e:
-        print(f"❌ FEHLER beim Senden der Willkommensnachricht: {e}")
-
-    # Rolle zuweisen
     if role:
         try:
             await member.add_roles(role)
-            print(f"✅ DEBUG: Rolle {role_name} wurde {member.name} erfolgreich zugewiesen!")
+            print(f"✅ Rolle {role_name} wurde {member.name} zugewiesen!")
+        except Exception as e:
+            print(f"❌ Fehler beim Zuweisen der Rolle: {e}")
 
-        except discord.Forbidden:
-            print(f"❌ FEHLER: Bot hat keine Berechtigung, Rolle {role_name} zuzuweisen!")
-            print("Mögliche Ursachen:")
-            print("  - Bot-Rolle ist nicht hoch genug in der Hierarchie")
-            print("  - Bot hat keine 'Rollen verwalten'-Berechtigung")
 
-        except discord.HTTPException as e:
-            print(f"❌ HTTP-FEHLER beim Zuweisen der Rolle: {e}")
+@bot.event
+async def on_member_remove(member):
+    print(f"👋 DEBUG: {member.name} ({member.id}) hat den Server {member.guild.name} verlassen!")
+
+    # Konfiguration
+    join_log_channel_id = 1387484930438598859  # Gleicher Kanal wie Join-Logs
+
+    # === LEAVE-LOG ===
+    log_channel = bot.get_channel(join_log_channel_id)
+    if log_channel:
+        try:
+            # Erstelle Leave-Log Embed mit dunkelroter Farbe
+            log_embed = discord.Embed(
+                color=discord.Color.dark_red()
+            )
+
+            # Setze das Profilbild des Benutzers als Thumbnail
+            if member.avatar:
+                log_embed.set_thumbnail(url=member.avatar.url)
+            else:
+                log_embed.set_thumbnail(url=member.default_avatar.url)
+
+            # Haupttext mit Benutzername und ID
+            log_embed.add_field(
+                name="",
+                value=f"**{member.name}**\n<@{member.id}> hat uns verlassen.",
+                inline=False
+            )
+
+            # Server-Name und aktuelle Zeit
+            current_time = datetime.now().strftime('%d.%m.%Y %H:%M')
+            log_embed.add_field(
+                name="",
+                value=f"**{member.guild.name}** • {current_time}",
+                inline=False
+            )
+
+            await log_channel.send(embed=log_embed)
+            print(f"✅ Leave-Log für {member.name} gesendet!")
 
         except Exception as e:
-            print(f"❌ UNBEKANNTER FEHLER beim Zuweisen der Rolle: {e}")
+            print(f"❌ Fehler bei Leave-Log: {e}")
 
 
 @bot.command()
@@ -135,19 +202,19 @@ async def ping(ctx):
 
 
 @bot.command()
-async def test_welcome(ctx):
+async def test_join(ctx):
     """Test-Befehl um die Willkommensfunktion manuell zu testen"""
-    print(f"Test-Willkommensnachricht angefordert von {ctx.author.name}")
-
-    # Simuliere ein member_join Event für den Benutzer, der den Befehl ausgeführt hat
+    print(f"Test-Join angefordert von {ctx.author.name}")
     await on_member_join(ctx.author)
-    await ctx.send("Test-Willkommensnachricht wurde ausgelöst! Überprüfe die Logs.")
+    await ctx.send("Test-Willkommensnachricht und Join-Log wurden ausgelöst! Überprüfe die Kanäle.")
 
 
-# Debug: Zeige beim Start alle wichtigen Informationen
-@bot.event
-async def on_guild_join(guild):
-    print(f"Bot wurde zu Server hinzugefügt: {guild.name} (ID: {guild.id})")
+@bot.command()
+async def test_leave(ctx):
+    """Test-Befehl um die Leave-Log-Funktion manuell zu testen"""
+    print(f"Test-Leave angefordert von {ctx.author.name}")
+    await on_member_remove(ctx.author)
+    await ctx.send("Test-Leave-Log wurde ausgelöst! Überprüfe den Log-Kanal.")
 
 
 # Starte den Bot
@@ -158,6 +225,3 @@ if TOKEN:
 else:
     print(
         "Fehler: Bot-Token nicht gefunden. Bitte setze die Umgebungsvariable 'DISCORD_BOT_TOKEN' oder füge das Token direkt in den Code ein.")
-
-
-
