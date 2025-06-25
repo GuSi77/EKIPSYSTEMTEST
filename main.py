@@ -58,12 +58,6 @@ async def on_member_join(member):
                 embed.set_author(name=member.name)
                 embed.set_footer(text=f"Willkommen auf {member.guild.name}")
 
-            embed.add_field(
-                name="Server-Info",
-                value=f"Du bist das {len(member.guild.members)}. Mitglied!",
-                inline=False
-            )
-
             await welcome_channel.send(embed=embed)
             print(f"✅ Willkommensnachricht für {member.name} gesendet!")
 
@@ -163,10 +157,10 @@ async def on_member_remove(member):
     print(f"👋 DEBUG: {member.name} ({member.id}) hat den Server {member.guild.name} verlassen!")
 
     # Konfiguration
-    join_log_channel_id = 1387484932862906450
+    leave_log_channel_id = 1387484932862906450  # Neuer Leave-Log-Kanal
 
     # === LEAVE-LOG ===
-    log_channel = bot.get_channel(join_log_channel_id)
+    log_channel = bot.get_channel(leave_log_channel_id)
     if log_channel:
         try:
             # Erstelle Leave-Log Embed mit dunkelroter Farbe
