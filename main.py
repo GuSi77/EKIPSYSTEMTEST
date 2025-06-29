@@ -10,12 +10,12 @@ load_dotenv()
 # Bot-Token sicher aus Umgebungsvariablen laden
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-# Konfiguration aus Umgebungsvariablen
-WELCOME_CHANNEL_ID = int(os.getenv('WELCOME_CHANNEL_ID', 0))
-JOIN_LOG_CHANNEL_ID = int(os.getenv('JOIN_LOG_CHANNEL_ID', 0))
-LEAVE_LOG_CHANNEL_ID = int(os.getenv('LEAVE_LOG_CHANNEL_ID', 0))
-VOICE_LOG_CHANNEL_ID = int(os.getenv('VOICE_LOG_CHANNEL_ID', 0))
-MEMBER_ROLE_NAME = os.getenv('MEMBER_ROLE_NAME', 'Mitglied')
+# Konfiguration - Channel IDs direkt im Code
+WELCOME_CHANNEL_ID = 1387484818052481164
+JOIN_LOG_CHANNEL_ID = 1387484930438598859
+LEAVE_LOG_CHANNEL_ID = 1387484932862906450
+VOICE_LOG_CHANNEL_ID = 1387484934423449631
+MEMBER_ROLE_NAME = 'Mitglied'
 
 # Korrekte Intent-Konfiguration mit allen notwendigen Intents
 intents = discord.Intents.default()
